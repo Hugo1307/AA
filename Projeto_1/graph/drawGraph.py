@@ -1,7 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 
-from domainClasses import Vertice, Edge
+from utils.utils import Vertice, Edge
 
 
 def draw_graph(vertices: list[Vertice], edges: list[Edge]):
@@ -17,7 +17,7 @@ def draw_graph(vertices: list[Vertice], edges: list[Edge]):
     for e in edges:
         G.add_edge(e.v1, e.v2)
 
-    nx.draw(G, labels=labels, with_labels=True, node_size=50, width=2, font_size=9, pos=positions)
+    nx.draw(G, labels=labels, with_labels=True, node_size=300, width=2, font_size=10, pos=positions)
     plt.show()
     plt.close()
 

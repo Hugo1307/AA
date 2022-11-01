@@ -1,21 +1,21 @@
-import math
 import numpy as np
 
-from utils import Vertice, Edge
+from utils.utils import Vertice, Edge
+from math import comb, floor
 
 
 def generate_graph(v, p):
     n_mec = 98497
 
     np.random.seed(n_mec)
-    num_edges = math.floor(v * p)
+    num_edges = floor(comb(v, 2) * p)
 
     vertices = []
     while len(vertices) < v:
 
         x = np.random.randint(1, 21)
         y = np.random.randint(1, 21)
-        vertice_weight = np.random.randint(1, 30)
+        vertice_weight = np.random.randint(1, 50)
 
         vertice = Vertice(x, y, vertice_weight)
 

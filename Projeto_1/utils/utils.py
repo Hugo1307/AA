@@ -1,6 +1,7 @@
+from functools import reduce
 from itertools import chain, combinations
 from math import comb
-from domainClasses import Vertice, Edge, Clique
+from utils.domainClasses import Vertice, Edge
 
 
 def powerset(iterable):
@@ -59,26 +60,22 @@ def get_vertice_neighbors(vertice: Vertice, edges: list[Edge]) -> list[Vertice]:
     return neighbors
 
 
-def print_results(max_weight_clique: Clique):
+def get_max_common_neighbor(vertices_list, edges) -> Vertice | None:
 
-    if max_weight_clique is not None:
+    neighbors_of_all_vertices = []
 
-        print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
-        print()
-        print(" Results Found!")
-        print()
-        print(" Max Weight Clique:")
-        print("  ", max_weight_clique.vertices)
-        print()
-        print(" Max Weight:")
-        print("  ", max_weight_clique.weight)
-        print()
-        print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
+    for vertice in vertices_list:
+        neighbors_of_all_vertices.append(get_vertice_neighbors(vertice, edges))
 
+    neighbors_of_all_vertices = list(reduce(set.intersection,
+                                            [set(item) for item in neighbors_of_all_vertices]))
+
+    # Remove all vertices already in the list - to not create a loop
+    for vertice in vertices_list:
+        if vertice in neighbors_of_all_vertices:
+            neighbors_of_all_vertices.remove(vertice)
+
+    if len(neighbors_of_all_vertices) > 0:
+        return sorted(neighbors_of_all_vertices, key=lambda v: v.weight, reverse=True)[0]
     else:
-
-        print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
-        print()
-        print(" No Cliques found...")
-        print()
-        print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
+        return None
