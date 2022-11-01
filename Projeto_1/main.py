@@ -49,9 +49,9 @@ def run_simulation(graphs, output_mode, algorithm_name):
     print()
 
     # Erase file contents
-    open(f"{algorithm_name}_results.txt", "w").close()
+    open(f"results/{algorithm_name}_results.txt", "w").close()
 
-    output_file = open(f"{algorithm_name}_results.txt", "a")
+    output_file = open(f"results/{algorithm_name}_results.txt", "a")
 
     if not output_mode:
         print("Vertices\tEdges Prob.\tMax Weight\tSearch Time".expandtabs(30))
