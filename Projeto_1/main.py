@@ -11,8 +11,8 @@ import os
 
 
 def main(output_mode=False):
-    graphs = generate_all_graphs(400)
-    run_simulation(graphs, output_mode, "Greedy")
+    graphs = generate_all_graphs(200)
+    run_simulation(graphs, output_mode, "Backtracking")
 
 
 def generate_all_graphs(max_vertices):
@@ -59,9 +59,11 @@ def run_simulation(graphs, output_mode, algorithm_name):
         output_file.write("Vertices\tEdges Prob.\tMax Weight\tSearch Time\n".expandtabs(30))
 
     # Get Results for Algorithm
+    graph_count = 0
     for graph in graphs:
 
         vertices, edges, edges_prob = graph[0][0], graph[0][1], graph[1]
+        graph_count += 1
 
         if algorithm_name == "Greedy":
             algorithm = GreedySearch(vertices, edges)
@@ -87,10 +89,14 @@ def run_simulation(graphs, output_mode, algorithm_name):
             output_file.write(
                 f"{len(vertices)}\t{edges_prob}\t{max_clique.weight}\t{search_delta_time}\n".expandtabs(
                     30))
-            print(f"Progress (%): {round(len(vertices) * 100 / len(graphs), 2)}", end='\r')
+            print(f"Progress (%): {round(graph_count * 100 / len(graphs), 2)}", end='\r')
+
+        if search_delta_time > 60:
+            print("Stopped due to timeout...")
+            break
 
     output_file.close()
 
 
 if __name__ == "__main__":
-    main(output_mode=False)
+    main(output_mode=True)
