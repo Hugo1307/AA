@@ -1,42 +1,43 @@
 from functools import reduce
-from itertools import chain, combinations
+from itertools import combinations
 from math import comb
 from utils.domainClasses import Vertice, Edge
 
 
 def powerset(iterable):
-    s = list(iterable)
-    return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
+
+    all_subsets = []
+    operation_count = 0
+
+    for L in range(len(iterable) + 1):
+        for subset in combinations(iterable, L):
+            operation_count += 1
+            all_subsets.append(subset)
+
+    return all_subsets, operation_count
 
 
-def is_clique(vertice_subset: list[Vertice], edges: list[Edge]):
+def is_clique(vertice_subset: list[Vertice], edges: list[Edge]) -> tuple[bool, int]:
 
     edges_found = []
     vertices_in_subset_count = len(vertice_subset)
+    operations_count = 0
 
     if comb(vertices_in_subset_count, 2) > len(edges):
-        return False
+        return False, operations_count
 
-    for current_vertice_idx in range(0, vertices_in_subset_count):
-        for next_vertice_idx in range(0, vertices_in_subset_count):
-
-            if current_vertice_idx == next_vertice_idx:
-                continue
-
-            current_vertice = vertice_subset[current_vertice_idx]
-            next_vertice = vertice_subset[next_vertice_idx]
-
-            temp_edge = Edge(current_vertice, next_vertice)
-
-            if temp_edge in edges and temp_edge not in edges_found:
-                edges_found.append(temp_edge)
+    for edge in edges:
+        if edge.v1 in vertice_subset and edge.v2 in vertice_subset and edge.v1 != edge.v2:
+            if edge not in edges_found:
+                edges_found.append(edge)
+                operations_count += 1
                 # print("Found Edge: ", temp_edge)
 
     """
     There is one edge for each choice of two vertices, therefore, the number of edges
     is equal to the combination of (n 2) i.e., from each n vertices choose 2
     """
-    return len(edges_found) > 0 and len(edges_found) == comb(vertices_in_subset_count, 2)
+    return len(edges_found) > 0 and len(edges_found) == comb(vertices_in_subset_count, 2), operations_count
 
 
 def subset_weight_sum(vertices_subset: list[Vertice]):
@@ -47,35 +48,51 @@ def subset_weight_sum(vertices_subset: list[Vertice]):
     return weight_sum
 
 
-def get_vertice_neighbors(vertice: Vertice, edges: list[Edge]) -> list[Vertice]:
+def get_vertice_neighbors(vertice: Vertice, edges: list[Edge]) -> tuple[list[Vertice], int]:
 
     neighbors = []
+    operations_count = 0
 
     for edge in edges:
+        operations_count += 1
         if edge.v1 == vertice:
             neighbors.append(edge.v2)
         if edge.v2 == vertice:
             neighbors.append(edge.v1)
 
-    return neighbors
+    return neighbors, operations_count
 
 
-def get_max_common_neighbor(vertices_list, edges) -> Vertice | None:
+def get_max_common_neighbor(vertices_list, edges) -> tuple[Vertice, int] | tuple[None, int]:
 
     neighbors_of_all_vertices = []
+    operations_count = 0
 
     for vertice in vertices_list:
-        neighbors_of_all_vertices.append(get_vertice_neighbors(vertice, edges))
+        neighbors = []
+        operations_count = 0
+
+        for edge in edges:
+            operations_count += 1
+            if edge.v1 == vertice:
+                neighbors.append(edge.v2)
+            if edge.v2 == vertice:
+                neighbors.append(edge.v1)
+        neighbors_of_all_vertices.append(neighbors)
+        operations_count += 1
 
     neighbors_of_all_vertices = list(reduce(set.intersection,
                                             [set(item) for item in neighbors_of_all_vertices]))
 
     # Remove all vertices already in the list - to not create a loop
     for vertice in vertices_list:
+
         if vertice in neighbors_of_all_vertices:
             neighbors_of_all_vertices.remove(vertice)
 
+        operations_count += 1
+
     if len(neighbors_of_all_vertices) > 0:
-        return sorted(neighbors_of_all_vertices, key=lambda v: v.weight, reverse=True)[0]
+        return sorted(neighbors_of_all_vertices, key=lambda v: v.weight, reverse=True)[0], operations_count,
     else:
-        return None
+        return None, operations_count,

@@ -12,7 +12,7 @@ import os
 
 def main(output_mode=False):
     graphs = generate_all_graphs(200)
-    run_simulation(graphs, output_mode, "Backtracking")
+    run_simulation(graphs, output_mode, "Exhaustive")
 
 
 def generate_all_graphs(max_vertices):
@@ -49,14 +49,15 @@ def run_simulation(graphs, output_mode, algorithm_name):
     print()
 
     # Erase file contents
-    open(f"results/{algorithm_name}_results.txt", "w").close()
+    if output_mode:
+        open(f"results/{algorithm_name}_results.txt", "w").close()
 
     output_file = open(f"results/{algorithm_name}_results.txt", "a")
 
     if not output_mode:
-        print("Vertices\tEdges Prob.\tMax Weight\tSearch Time".expandtabs(30))
+        print("Vertices\tEdges_Prob.\tMax_Weight\tOps._Count\tTested_Solutions\tSearch_Time".expandtabs(30))
     else:
-        output_file.write("Vertices\tEdges Prob.\tMax Weight\tSearch Time\n".expandtabs(30))
+        output_file.write("Vertices\tEdges_Prob.\tMax_Weight\tOps._Count\tTested_Solutions\tSearch_Time\n".expandtabs(30))
 
     # Get Results for Algorithm
     graph_count = 0
@@ -76,22 +77,24 @@ def run_simulation(graphs, output_mode, algorithm_name):
 
         # algorithm.draw_graph()
         start_time_search = time.time()
-        max_clique = algorithm.perform_search()
+        max_clique, operations_count, tested_solutions = algorithm.perform_search()
         end_time_search = time.time()
 
         search_delta_time = end_time_search - start_time_search
 
         if not output_mode:
             print(
-                f"{len(vertices)}\t{edges_prob}\t{max_clique.weight}\t{search_delta_time}".expandtabs(
-                    30))
+                f"{len(vertices)}\t{edges_prob}\t{max_clique.weight}\t{operations_count}\t{tested_solutions}\t{search_delta_time}"
+                .expandtabs(30)
+            )
         else:
             output_file.write(
-                f"{len(vertices)}\t{edges_prob}\t{max_clique.weight}\t{search_delta_time}\n".expandtabs(
-                    30))
+                f"{len(vertices)}\t{edges_prob}\t{max_clique.weight}\t{operations_count}\t{tested_solutions}\t{search_delta_time}\n"
+                .expandtabs(30)
+            )
             print(f"Progress (%): {round(graph_count * 100 / len(graphs), 2)}", end='\r')
 
-        if search_delta_time > 60:
+        if search_delta_time > 120:
             print("Stopped due to timeout...")
             break
 
