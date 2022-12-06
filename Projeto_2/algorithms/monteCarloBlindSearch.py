@@ -7,7 +7,8 @@ from utils.domainClasses import Clique
 from utils.utils import is_clique
 
 
-class MonteCarloSearch(SearchAlgorithm):
+# Blind Monte Carlo Algorithm Search
+class MonteCarloBlindSearch(SearchAlgorithm):
 
     def __init__(self, vertices, edges_probability, ):
         super().__init__(vertices, edges_probability)
@@ -17,9 +18,6 @@ class MonteCarloSearch(SearchAlgorithm):
         performed_operations = 0
         tested_solutions = 0
         start_time = time.time()
-
-        # Sort the vertices by their weight
-        # sorted_vertices = sorted(self.vertices, key=lambda v: v.weight, reverse=True)
 
         max_clique = None
 
@@ -35,10 +33,13 @@ class MonteCarloSearch(SearchAlgorithm):
             # "len(self.vertices)" elements
             max_combinations_count = comb(len(self.vertices), number_of_vertices_in_subset)
 
-            time_elapsed = time.time()-start_time
+            time_elapsed = time.time() - start_time
 
             # While we didn't test all the possible subsets
-            while len(tested_subsets) < max_combinations_count and not self.is_over_limits(performed_operations, time_elapsed, tested_solutions):
+            while len(tested_subsets) < max_combinations_count \
+                    and not self.is_over_limits(performed_operations, time_elapsed, tested_solutions):
+
+                time_elapsed = time.time() - start_time
 
                 # We use a set because we don't want to add the same vertice twice in the same subset.
                 subset = set()
@@ -81,9 +82,9 @@ class MonteCarloSearch(SearchAlgorithm):
     @staticmethod
     def is_over_limits(operations_count, time_limit, tested_solutions):
 
-        max_operations = 50000
-        max_time_limit = 20
-        max_tested_solutions = 10000
+        max_operations = 150000         # 150k
+        max_time_limit = 2              # 2 seconds
+        max_tested_solutions = 50000    # 50k
 
         if operations_count is not None and operations_count > max_operations:
             return True

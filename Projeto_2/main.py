@@ -1,6 +1,7 @@
 import pickle
 
-from algorithms.monteCarloSearch import MonteCarloSearch
+from algorithms.monteCarloBlindSearch import MonteCarloBlindSearch
+from algorithms.monteCarloProbSearch import MonteCarloProbSearch
 
 from graph.generateGraph import generate_graph
 
@@ -8,9 +9,9 @@ import time
 import os
 
 
-def main(output_mode=False):
+def main(algorithm: str, output_mode):
     graphs = generate_all_graphs(200)
-    run_simulation(graphs, output_mode, "MonteCarlo")
+    run_simulation(graphs, output_mode, algorithm)
 
 
 def generate_all_graphs(max_vertices):
@@ -66,8 +67,10 @@ def run_simulation(graphs, output_mode, algorithm_name):
         vertices, edges, edges_prob = graph[0][0], graph[0][1], graph[1]
         graph_count += 1
 
-        if algorithm_name == "MonteCarlo":
-            algorithm = MonteCarloSearch(vertices, edges)
+        if algorithm_name == "MonteCarloProb":
+            algorithm = MonteCarloProbSearch(vertices, edges)
+        elif algorithm_name == "MonteCarloBlind":
+            algorithm = MonteCarloBlindSearch(vertices, edges)
         else:
             raise NotImplemented()
 
@@ -98,4 +101,4 @@ def run_simulation(graphs, output_mode, algorithm_name):
 
 
 if __name__ == "__main__":
-    main(output_mode=False)
+    main("MonteCarloProb", output_mode=False)
