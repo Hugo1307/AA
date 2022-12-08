@@ -37,7 +37,7 @@ class MonteCarloBlindSearch(SearchAlgorithm):
 
             # While we didn't test all the possible subsets
             while len(tested_subsets) < max_combinations_count \
-                    and not self.is_over_limits(performed_operations, time_elapsed, tested_solutions):
+                    and not self.is_over_limits(performed_operations, time_elapsed, tested_solutions, len(self.vertices), False):
 
                 time_elapsed = time.time() - start_time
 
@@ -80,11 +80,16 @@ class MonteCarloBlindSearch(SearchAlgorithm):
 
     # Check if the algorithm should be stopped due to meeting certain conditions
     @staticmethod
-    def is_over_limits(operations_count, time_limit, tested_solutions):
+    def is_over_limits(operations_count, time_limit, tested_solutions, vertices_count, adaptive=False):
 
-        max_operations = 150000         # 150k
-        max_time_limit = 2              # 2 seconds
-        max_tested_solutions = 50000    # 50k
+        if not adaptive:
+            max_operations = 500000  # 500 k
+            max_time_limit = 3  # 3 seconds
+            max_tested_solutions = 75000  # 75 k
+        else:
+            max_operations = 150 * vertices_count ** 2 + 100000
+            max_time_limit = 1 / 1700 * vertices_count ** 2 + 0.8
+            max_tested_solutions = 80 * vertices_count ** 2 + 75000
 
         if operations_count is not None and operations_count > max_operations:
             return True

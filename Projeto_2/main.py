@@ -1,3 +1,4 @@
+import sys
 import pickle
 
 from algorithms.monteCarloBlindSearch import MonteCarloBlindSearch
@@ -9,9 +10,9 @@ import time
 import os
 
 
-def main(algorithm: str, output_mode):
+def main(algorithm: str, file_as_output, graphs_slice: tuple):
     graphs = generate_all_graphs(200)
-    run_simulation(graphs, output_mode, algorithm)
+    run_simulation(graphs, file_as_output, algorithm, graphs_slice)
 
 
 def generate_all_graphs(max_vertices):
@@ -21,7 +22,6 @@ def generate_all_graphs(max_vertices):
     else:
 
         graphs = []
-
         print("Generating Graphs...")
 
         start = time.time()
@@ -42,7 +42,7 @@ def generate_all_graphs(max_vertices):
         return graphs
 
 
-def run_simulation(graphs, output_mode, algorithm_name):
+def run_simulation(graphs, output_mode, algorithm_name, slicing):
 
     print(f"Max Weight Clique - {algorithm_name} Algorithm")
     print()
@@ -62,7 +62,13 @@ def run_simulation(graphs, output_mode, algorithm_name):
 
     # Get Results for Algorithm
     graph_count = 0
-    for graph in graphs:
+
+    if slicing[0] == -1 or slicing[1] == -1:
+        graphs_to_compute = graphs
+    else:
+        graphs_to_compute = graphs[slicing[0]:slicing[1]]
+
+    for graph in graphs_to_compute:
 
         vertices, edges, edges_prob = graph[0][0], graph[0][1], graph[1]
         graph_count += 1
@@ -100,5 +106,22 @@ def run_simulation(graphs, output_mode, algorithm_name):
     output_file.close()
 
 
+def start_program():
+
+    # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    # Arguments
+    # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    # First Argument: Algorithm to be used
+    # Second Argument: Output to file?
+    # Third Argument: First element of graphs slice
+    # Fourth Argument: Second element of graphs slice
+
+    algorithm = sys.argv[1] if len(sys.argv) > 1 else "MonteCarloProb"
+    output_to_file = sys.argv[2] == "True" if len(sys.argv) > 2 else False
+    slicing = tuple([int(sys.argv[3]) if len(sys.argv) > 3 else -1, int(sys.argv[4]) if len(sys.argv) > 4 else -1])
+
+    main(algorithm, output_to_file, slicing)
+
+
 if __name__ == "__main__":
-    main("MonteCarloProb", output_mode=False)
+    start_program()
